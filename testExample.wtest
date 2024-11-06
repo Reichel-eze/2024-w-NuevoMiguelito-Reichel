@@ -1,2 +1,73 @@
 import example.*
 
+// 1) Tener una parrillada con al menos tres componentes y probar los casos significativos.
+
+const provoletaSinEmpanado =  new Provoleta (peso = 10, empanado = false)
+const hamburguesaCeliaca = new Hamburguesa(pesoMedallon = 100, pan = deMaiz)
+const bife = new CorteDeCarne(peso = 200)
+const parrilladaCeliaca = new Parrillada(comidas = [provoletaSinEmpanado, hamburguesaCeliaca, bife])
+
+const hamburguesaSimple = new Hamburguesa(pesoMedallon = 200, pan = casero)
+
+describe "1. Test de Parrilladas" {
+  
+  test "Una parrillada celiaca es apta para el consumo de celiacos" {
+    assert.that(parrilladaCeliaca.esAptoCeliaco())
+  }
+
+  test "Una parrillada celiaca tiene un peso de 340" {
+    assert.equals(340, parrilladaCeliaca.peso())
+  }
+
+  test "Una parrillada celiaca tiene es especial" {
+    assert.that(parrilladaCeliaca.esEspecial())
+  }
+
+  test "Una parrillada celiaca tiene una valoracion de 100 (debido a que la comida con mayor valoracion es la hamburguesaCeliaca)" {
+    assert.equals(100, parrilladaCeliaca.valoracion())
+  }
+
+  test "Una parrillada celiaca tiene un precio de 31200 (se le suma 1200 porque es apta celiaca) " {
+    assert.equals(31200, parrilladaCeliaca.precio())
+  }
+
+}
+
+// 2) Hacer que un comensal se de un gusto en la parrilla, incluyendo al menos un caso donde pueda comprar y otro que no. 
+
+const ezequiel = new Comensal (dinero = 30000, habitoAlimentacion = todoTerreno)
+
+describe "2. Test de Comensales" {
+  test "El comensal pablo, que es celiaco, se puede dar un gusto en la parrilla Celiaca y eso hace disminuir su dinero" {
+    const pablo = new Comensal (dinero = 40000, habitoAlimentacion = celiaco)
+    miguelito.agregarComida(parrilladaCeliaca)
+    pablo.darseUnGusto()
+    assert.equals(8800, pablo.dinero())
+  }
+
+  test "El comensal ezequiel, todo terrerno, no se puede dar el gusto en la parrilla celiaca porque no le alcanza"{
+    miguelito.agregarComida(parrilladaCeliaca)
+    ezequiel.darseUnGusto()
+    assert.equals(30000, ezequiel.dinero())
+    // VA A SALTAR EL DOMAIN EXCEPTION
+  }
+
+  test "El comensal ezequiel, todo terrerno, se puede dar el gusto de una hamburguesa simple, pudiendola comprar"{
+    miguelito.agregarComida(hamburguesaSimple)
+    ezequiel.darseUnGusto()
+    assert.equals(21000, ezequiel.dinero())
+  }
+
+
+}
+
+// Realizar un cambio de hábito de algún comensal, y que alguna de las situaciones anteriores tenga otro resultado.
+
+describe "3. Cambio de habitos" {
+  test "El comensal ezequiel se volvio celiaco, por lo tanto ya no puede comer la hamburguesa simple porque contiene pan casero, entonces no se le reduce el dinero " {
+    ezequiel.cambiarHabito(celiaco)
+    miguelito.agregarComida(hamburguesaSimple)
+    ezequiel.darseUnGusto()
+    assert.equals(30000, ezequiel.dinero())
+  }
+}

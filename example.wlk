@@ -62,12 +62,12 @@ object deMaiz {
 
 class Pan {
   var property peso
-  var property aptoCeliaco = false  // pongo false como generico
+  var property esAptoCeliaco = false  // pongo false como generico
 }
 
 const industrial = new Pan (peso = 60)
 const casero = new Pan (peso = 100)
-const deMaiz = new Pan (peso = 30, aptoCeliaco = true)
+const deMaiz = new Pan (peso = 30, esAptoCeliaco = true)
 
 class HamburguesaDoble inherits Hamburguesa {
   
@@ -107,24 +107,28 @@ class Parrillada inherits Plato {
 
 class Comensal {
   var dinero
+  var habitoAlimentacion
 
-  method leAgrada(comida)
+  method leAgrada(comida) = habitoAlimentacion.leAgrada(comida)     
+  // A un comensal empieza a tener problemas gástricos y le descubren celiaquía, con lo que modifica sus hábitos de alimentación 
+  // (es decir, que el habito ahora es una variable que puede ir cambiando)
   
   method darseUnGusto() {
     self.platoConMaximaValoracion()
   }
 
   method comprarPlato(comida) {
+    if(dinero < comida.precio()) throw new DomainException(message="No hay dinero suficiente para pagar la comida")
     dinero = dinero - comida.precio()
     miguelito.vender(comida,self)
   }
 
-  method puedePagar(comida) = dinero >= comida.precio()
+  //method puedePagar(comida) = dinero >= comida.precio()
 
 
   method platoConMaximaValoracion() { 
     var platoMaximo = miguelito.platoConMaximaValoracion()
-    if(self.leAgrada(platoMaximo) and self.puedePagar(platoMaximo)) {self.comprarPlato(platoMaximo)}
+    if(self.leAgrada(platoMaximo)) {self.comprarPlato(platoMaximo)}
     //else if()
   }
 
@@ -132,18 +136,28 @@ class Comensal {
     dinero = dinero + promocion
   }
 
+  method cambiarHabito(nuevoHabito) {
+    habitoAlimentacion = nuevoHabito
+  }
+
+  method dinero() = dinero
+
+
 }
 
-class Celiaco inherits Comensal{
-  override method leAgrada(comida) = comida.aptoCeliaco() 
+object celiaco {
+  method leAgrada(comida) = comida.esAptoCeliaco() 
+  method esPaladarFino() = false
 }
 
-class PaldarFino inherits Comensal{
-  override method leAgrada(comida) = comida.esEspecial() or comida.valoracion() > 100
+object paladarFino {
+  method leAgrada(comida) = comida.esEspecial() or comida.valoracion() > 100
+  method esPaladarFino() = true
 }
 
-class TodoTerreno inherits Comensal{
-  override method leAgrada(comida) = true   // todo les agrada 
+object todoTerreno {
+  method leAgrada(comida) = true   // todo les agrada 
+  method esPaladarFino() = false
 }
 
 object miguelito {
@@ -164,6 +178,26 @@ object miguelito {
 
   method hacerPromocion(dineroARegalar){
     comensales.forEach({comensal => comensal.obtenerPromocion(dineroARegalar)})
+  }
+
+  method agregarComida(comida) {
+    platos.add(comida)
+  }
+
+
+}
+
+// Debido a un cierta decisión económica que toma un gobierno recientemente elegido en algún lugar del mundo, 
+// una serie de comensales que se consideraba de paladar fino se ven fuertemente limitados en sus posibilidades 
+// económicas y deciden hacerse "todo terreno". 
+
+object gobierno {
+  const ciudadanos = []
+
+  method ciudadanosFinos() = ciudadanos.filter({ciudadano => ciudadano.esPaladarFino()})
+
+  method decisionEconomica() {
+    self.ciudadanosFinos().forEach({ciudadano => ciudadano.cambiarHabito(todoTerreno)})
   }
 
 }
