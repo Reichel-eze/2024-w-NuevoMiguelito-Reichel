@@ -47,7 +47,7 @@ describe "2. Test de Comensales" {
 
   test "El comensal ezequiel, todo terrerno, no se puede dar el gusto en la parrilla celiaca porque no le alcanza"{
     miguelito.agregarComida(parrilladaCeliaca)
-    ezequiel.darseUnGusto()
+    assert.throwsException({ezequiel.darseUnGusto()})   // Chequea que es una excepcion, pero sigue ejecutando la linea de codigo siguiente 
     assert.equals(30000, ezequiel.dinero())
     // VA A SALTAR EL DOMAIN EXCEPTION
   }
